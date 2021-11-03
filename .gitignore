@@ -1,0 +1,14 @@
+node_modules
+dist
+build
+.temp
+.env
+.eslintcache
+.idea
+.env.test
+package-lock.json
+logs
+.DS_Store
+googlecert.json
+.vscode
+service-account.json
