@@ -1,17 +1,32 @@
 import { Log, Logging } from '@google-cloud/logging'
+import winston from 'winston'
 import { LogEntry } from '@google-cloud/logging/build/src/entry'
-
-import { LOGS_SEVERITY } from './options'
 
 import fs from 'fs'
 
+import { LOGS_SEVERITY } from './options'
+
+const logger = winston.createLogger({
+  transports: [new winston.transports.Console()],
+  format: winston.format.combine(
+    winston.format.colorize(),
+    winston.format.json()
+  )
+})
+
+let cloudLoggingOff = process.env.CLOUD_LOGGING_OFF === 'true'
+cloudLoggingOff =
+  process.env.NODE_ENV !== 'development' ? false : cloudLoggingOff
+
 const readServiceAccount = () => {
   const rowData = fs.readFileSync('service-account.json')
-
   return rowData.toString()
 }
 
 const getServiceAccount: any = () => {
+  if (cloudLoggingOff) {
+    return {}
+  }
   const account = process.env.SERVICE_ACCOUNT || readServiceAccount()
 
   return JSON.parse(account)
@@ -26,7 +41,7 @@ const serviceAccount = getServiceAccount()
 class CloudLogging {
   logging: Logging
   log: Log
-  logName: string
+  private logName: string
 
   /* @dev change resBody types */
   resBody: any
@@ -40,7 +55,7 @@ class CloudLogging {
   */
   constructor() {
     this.logging = new Logging({
-      projectId: serviceAccount.project_id
+      projectId: serviceAccount?.project_id
     })
 
     this.logName = process.env.SERVICE
@@ -126,8 +141,47 @@ class CloudLogging {
   }
 
   info(text) {
+    logger.info(text)
+    if (cloudLoggingOff) return
+
     const entry = this.log.entry(text)
     this.log.write(entry)
   }
+  warn(text) {
+    logger.warn(text)
+    if (cloudLoggingOff) return
+
+    const entry = this.log.entry(
+      {
+        severity: 'WARNING'
+      },
+      text
+    )
+    this.log.warning(entry)
+  }
+  error(text) {
+    logger.error(text)
+    if (cloudLoggingOff) return
+
+    const entry = this.log.entry(
+      {
+        severity: 'ERROR'
+      },
+      text
+    )
+    this.log.error(entry)
+  }
+  alert(text) {
+    const entry = this.log.entry(
+      {
+        severity: 'ALERT'
+      },
+      text
+    )
+    this.log.alert(entry)
+  }
 }
-export default CloudLogging
+
+let gLogger: CloudLogging
+
+export const Logger = gLogger || new CloudLogging()

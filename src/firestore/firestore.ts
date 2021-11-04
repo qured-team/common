@@ -1,4 +1,4 @@
-import { ApiError } from 'exceptions'
+import { ApiError } from '../exceptions'
 import fs from 'firebase-admin'
 
 const initiateFirebaseApp = () => {
@@ -15,11 +15,9 @@ const initiateFirebaseApp = () => {
 
 initiateFirebaseApp()
 
-const firestore = fs.firestore()
+export const firestore = fs.firestore()
 firestore.settings({ ignoreUndefinedProperties: true })
 
 export const DbError = (message: string) => {
   throw new ApiError(404, message)
 }
-
-export default firestore

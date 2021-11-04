@@ -1,6 +1,6 @@
 import cors, { CorsOptions } from 'cors'
 
-export default () => {
+export const httpCors = () => {
   const options: CorsOptions = {
     origin: true,
     credentials: true
