@@ -4,7 +4,7 @@ export interface QueryFilter {
   value: string | number
 }
 
-type Operator =
+export type Operator =
   | '=='
   | '!='
   | '<'

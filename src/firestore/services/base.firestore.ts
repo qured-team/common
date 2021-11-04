@@ -1,12 +1,12 @@
-import { isoNow } from 'utilities/utils'
-import firestore, { DbError } from 'firestore/firestore'
+import { isoNow } from '../../utilities/utils'
+import { firestore, DbError } from '../firestore'
 import {
   IBaseUpdatePicker,
   IIdentity,
   IService,
   OrderIndex,
   Pager
-} from 'firestore/service.interface'
+} from '../service.interface'
 
 export class BaseService<E extends IIdentity> implements IService<E> {
   constructor(private ENTITY_CLASS: string) {}
@@ -21,15 +21,15 @@ export class BaseService<E extends IIdentity> implements IService<E> {
       const result: Array<E> = []
 
       let query: any = firestore.collection(this.ENTITY_CLASS)
-      
-      filters && Object.keys(filters).forEach((key) => {
-        query = query.where(key, '==', filters[key])
-      })
+
+      filters &&
+        Object.keys(filters).forEach((key) => {
+          query = query.where(key, '==', filters[key])
+        })
 
       orderBy && query.orderBy(orderBy, order || 'desc')
 
-      const snapshot = await query.limit(pager.limit)
-        .get()
+      const snapshot = await query.limit(pager.limit).get()
 
       snapshot.forEach((element) => {
         const entity: E = {

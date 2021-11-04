@@ -1,8 +1,8 @@
-import { HttpException } from 'exceptions'
+import { HttpException } from '../exceptions'
 import { NextFunction, Request, Response } from 'express'
-import { logger } from 'logger'
+import { Logger } from '../qured-logger'
 
-const errorMiddleware = (
+export const errorMiddleware = (
   error: HttpException,
   req: Request,
   res: Response,
@@ -12,12 +12,10 @@ const errorMiddleware = (
     const status: number = error.status || error.code || 500
     const message: string = error.message || 'Something went wrong'
 
-    logger.error(`StatusCode : ${status}, Message : ${message}`)
+    Logger.error(`StatusCode : ${status}, Message : ${message}`)
 
     res.status(status).json({ message })
   } catch (error) {
     next(error)
   }
 }
-
-export default errorMiddleware
