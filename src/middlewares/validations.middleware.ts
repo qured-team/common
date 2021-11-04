@@ -1,4 +1,4 @@
-import { ValidationException } from 'exceptions'
+import { ValidationException } from '../exceptions'
 import { Schema } from 'joi'
 
 export const validateRequestBody = <T>(schema: Schema<T>) => {
