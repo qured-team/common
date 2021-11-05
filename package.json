@@ -1,11 +1,13 @@
 {
   "name": "@qured/common",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "This package will contain reusable modules, middlewares, exceptions etc",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "NODE_PATH=./src tsc"
+    "build": "NODE_PATH=./src tsc",
+    "prepub": "cp package*.json build",
+    "pub": "npm publish ./build"
   },
   "author": "Sameer Ahmad",
   "license": "ISC",
