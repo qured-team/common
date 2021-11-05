@@ -1,7 +1,7 @@
-import { HttpException } from 'exceptions'
+import { HttpException } from '../exceptions'
 import { NextFunction, Request, Response } from 'express'
 
-const access = (api_access_code?: string) => (
+export const access = (api_access_code?: string) => (
   req: Request,
   res: Response,
   next: NextFunction
@@ -15,8 +15,6 @@ const access = (api_access_code?: string) => (
   if (accessCode === ACCESS_CODE) {
     next()
   } else {
-    next(new HttpException(404, 'Access denied'))
+    next(new HttpException(403, 'Access denied'))
   }
 }
-
-export default access

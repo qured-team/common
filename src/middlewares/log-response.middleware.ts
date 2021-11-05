@@ -1,6 +1,4 @@
-import interceptor from 'express-interceptor'
-
-export const interceptor = (
+export const  requestInterceptor = (
   req: Express.Request,
   res: Express.Response,
   log: any
