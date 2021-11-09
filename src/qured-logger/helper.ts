@@ -122,6 +122,8 @@ class CloudLogging {
     Different log type
   */
   request(req, res, time) {
+    if (cloudLoggingOff) return
+
     const { body } = req
 
     const input = {
