@@ -1,7 +1,7 @@
 {
   "name": "@qured/common",
   "version": "1.0.5",
-  "description": "This package will contain reusable modules, middlewares, exceptions etc",
+  "description": "This package will contain reusable modules, middlewares, exceptions etc.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
