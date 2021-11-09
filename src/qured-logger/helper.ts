@@ -5,6 +5,7 @@ import { LogEntry } from '@google-cloud/logging/build/src/entry'
 import fs from 'fs'
 
 import { LOGS_SEVERITY } from './options'
+import { X_CORRELATION_HEADER } from '../utilities/utils'
 
 const logger = winston.createLogger({
   transports: [new winston.transports.Console()],
@@ -24,9 +25,6 @@ const readServiceAccount = () => {
 }
 
 const getServiceAccount: any = () => {
-  if (cloudLoggingOff) {
-    return {}
-  }
   const account = process.env.SERVICE_ACCOUNT || readServiceAccount()
 
   return JSON.parse(account)
@@ -38,6 +36,7 @@ const serviceAccount = getServiceAccount()
 // @todo utility to fetch logs (from a client side) -> log.getEntries( {filter} )
 // @todo check if there is 5 errors in last 20 logs -> severity EMERGENCY
 
+let globalLogFields = {}
 class CloudLogging {
   logging: Logging
   log: Log
@@ -135,16 +134,40 @@ class CloudLogging {
 
     const metadata = this.setupLogRequestMetadata(req, res, time)
 
-    const entry = this.log.entry(metadata, input)
+    const entry = this.log.entry(
+      { ...metadata, trace: globalLogFields['logging.googleapis.com/trace'] },
+      input
+    )
 
     this.log.write([entry, output])
+  }
+
+  setTraceId(req, res, next) {
+    // Add log correlation to nest all log messages beneath request log in Log Viewer.
+    // (This only works for HTTP-based invocations where `req` is defined.)
+    if (typeof req !== 'undefined') {
+      const trace = req.headers[X_CORRELATION_HEADER]
+      if (trace && serviceAccount.project_id) {
+        globalLogFields[
+          'logging.googleapis.com/trace'
+        ] = `projects/${serviceAccount.project_id}/traces/${trace}`
+      }
+    }
+    next()
   }
 
   info(text) {
     logger.info(text)
     if (cloudLoggingOff) return
 
-    const entry = this.log.entry(text)
+    const entry = this.log.entry(
+      {
+        severity: 'INFO',
+        trace: globalLogFields['logging.googleapis.com/trace'],
+        textPayload: text
+      },
+      text
+    )
     this.log.write(entry)
   }
   warn(text) {
@@ -153,7 +176,9 @@ class CloudLogging {
 
     const entry = this.log.entry(
       {
-        severity: 'WARNING'
+        severity: 'WARNING',
+        trace: globalLogFields['logging.googleapis.com/trace'],
+        textPayload: text
       },
       text
     )
@@ -165,7 +190,9 @@ class CloudLogging {
 
     const entry = this.log.entry(
       {
-        severity: 'ERROR'
+        severity: 'ERROR',
+        trace: globalLogFields['logging.googleapis.com/trace'],
+        textPayload: text
       },
       text
     )
@@ -174,7 +201,9 @@ class CloudLogging {
   alert(text) {
     const entry = this.log.entry(
       {
-        severity: 'ALERT'
+        severity: 'ALERT',
+        trace: globalLogFields['logging.googleapis.com/trace'],
+        textPayload: text
       },
       text
     )
