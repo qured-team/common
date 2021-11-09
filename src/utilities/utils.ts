@@ -2,6 +2,8 @@ import _, { pickBy } from 'lodash'
 import { formatISO } from 'date-fns'
 import { utcToZonedTime } from 'date-fns-tz'
 
+export const X_CORRELATION_HEADER = 'x-correlation-id'
+
 const timeZone = 'Europe/London'
 
 export const removeFalsey = <T extends Record<string, unknown>>(value: T) => {
