@@ -9,7 +9,8 @@ export const errorMiddleware = (
   next: NextFunction
 ) => {
   try {
-    const status: number = error.status || error.code || 500
+    const status: number =
+      error.status || typeof error.code === 'number' ? error.code : 500
     const message: string = error.message || 'Something went wrong'
 
     Logger.error(`StatusCode : ${status}, Message : ${message}`)
