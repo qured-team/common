@@ -156,13 +156,14 @@ class CloudLogging {
     if (cloudLoggingOff) return
 
     const { body } = this.cleanUp(req.body)
+    const rawBody = this.cleanUp(this.resBody)
 
     const input = {
       ...body
     }
 
     const output = {
-      ...this.resBody
+      ...rawBody
     }
 
     const metadata = this.setupLogRequestMetadata(req, res, time)
