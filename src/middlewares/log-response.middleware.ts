@@ -1,7 +1,8 @@
-export const  requestInterceptor = (
+import { Logger } from '../qured-logger'
+
+export const requestInterceptor = (
   req: Express.Request,
-  res: Express.Response,
-  log: any
+  res: Express.Response
 ) => {
   return {
     isInterceptable: () => {
@@ -9,9 +10,10 @@ export const  requestInterceptor = (
     },
     intercept: (body, send) => {
       try {
-        log.resBody = JSON.parse(body)
+        Logger.resBody = JSON.parse(body)
       } catch (error) {
-        log.resBody = {
+        Logger.error(`Failed to parse resBody: ${error?.message}`)
+        Logger.resBody = {
           info: "Can't display response"
         }
       }

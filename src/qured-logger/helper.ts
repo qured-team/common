@@ -116,7 +116,38 @@ class CloudLogging {
 
     @dev: change data to extract from logs
   */
-  private cleanUp(body) {}
+  private cleanUp(body) {
+    try {
+      if (body?.operationName === 'createPassportImage') {
+        const { image } = body?.variables?.input
+        const { b64Image, ...restImage } = image ?? {}
+
+        body.variables.input.image = image
+          ? {
+              ...restImage
+            }
+          : {}
+      }
+
+      if (body?.operationName === 'createPassportImageAndKit') {
+        const { image } = body?.variables?.inputPassportImage
+        const { b64Image, ...restImage } = image ?? {}
+
+        body.variables.inputPassportImage.image = image
+          ? {
+              ...restImage
+            }
+          : {}
+      }
+
+      if (body?.data?.getPassportImage) {
+        delete body?.data?.getPassportImage?.b64Image
+      }
+      return body
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
   /*
     Different log type
@@ -124,14 +155,15 @@ class CloudLogging {
   request(req, res, time) {
     if (cloudLoggingOff) return
 
-    const { body } = req
+    const { body } = this.cleanUp(req.body)
+    const rawBody = this.cleanUp(this.resBody)
 
     const input = {
       ...body
     }
 
     const output = {
-      ...this.resBody
+      ...rawBody
     }
 
     const metadata = this.setupLogRequestMetadata(req, res, time)
