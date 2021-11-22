@@ -85,10 +85,10 @@ export class BaseService<E extends IIdentity> implements IService<E> {
     conditions: Record<string, any>,
     payload: IBaseUpdatePicker<E, K>
   ): Promise<boolean> => {
-    const query = firestore.collection(this.ENTITY_CLASS)
+    let query: any = firestore.collection(this.ENTITY_CLASS)
 
     Object.keys(conditions).forEach((key) => {
-      query.where(key, '==', conditions[key])
+      query = query.where(key, '==', conditions[key])
     })
 
     const snapshot = await query.get()
