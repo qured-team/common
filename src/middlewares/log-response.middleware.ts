@@ -1,12 +1,17 @@
 import { Logger } from '../qured-logger'
+import { Request, Response } from 'express'
 
-export const requestInterceptor = (
-  req: Express.Request,
-  res: Express.Response
-) => {
+export const requestInterceptor = (req: Request, res: Response) => {
   return {
     isInterceptable: () => {
-      return true
+      const contentType = res.get('Content-Type')
+      const isJson = contentType?.includes('application/json')
+      if (!isJson) {
+        console.log(
+          `Skiping the request logging as content type: ${contentType} is not json.`
+        )
+      }
+      return isJson
     },
     intercept: (body, send) => {
       try {
