@@ -6,6 +6,7 @@ import fs from 'fs'
 
 import { LOGS_SEVERITY } from './options'
 import { X_CORRELATION_HEADER } from '../utilities/utils'
+import { IRequestContext } from '../middlewares'
 
 const logger = winston.createLogger({
   transports: [new winston.transports.Console()],
@@ -190,53 +191,61 @@ class CloudLogging {
     next()
   }
 
-  info(text) {
+  info(text, context?: IRequestContext) {
     logger.info(text)
     if (cloudLoggingOff) return
 
     const entry = this.log.entry(
       {
         severity: 'INFO',
-        trace: globalLogFields['logging.googleapis.com/trace'],
+        trace:
+          context?.correlationId ||
+          globalLogFields['logging.googleapis.com/trace'],
         textPayload: text
       },
       text
     )
     this.log.write(entry)
   }
-  warn(text) {
+  warn(text, context?: IRequestContext) {
     logger.warn(text)
     if (cloudLoggingOff) return
 
     const entry = this.log.entry(
       {
         severity: 'WARNING',
-        trace: globalLogFields['logging.googleapis.com/trace'],
+        trace:
+          context?.correlationId ||
+          globalLogFields['logging.googleapis.com/trace'],
         textPayload: text
       },
       text
     )
     this.log.warning(entry)
   }
-  error(text) {
+  error(text, context?: IRequestContext) {
     logger.error(text)
     if (cloudLoggingOff) return
 
     const entry = this.log.entry(
       {
         severity: 'ERROR',
-        trace: globalLogFields['logging.googleapis.com/trace'],
+        trace:
+          context?.correlationId ||
+          globalLogFields['logging.googleapis.com/trace'],
         textPayload: text
       },
       text
     )
     this.log.error(entry)
   }
-  alert(text) {
+  alert(text, context?: IRequestContext) {
     const entry = this.log.entry(
       {
         severity: 'ALERT',
-        trace: globalLogFields['logging.googleapis.com/trace'],
+        trace:
+          context?.correlationId ||
+          globalLogFields['logging.googleapis.com/trace'],
         textPayload: text
       },
       text
