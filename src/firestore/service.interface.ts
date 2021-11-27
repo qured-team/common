@@ -38,6 +38,12 @@ export interface IService<E extends IIdentity> {
   add: (dto: Record<string, any>) => Promise<E>
 
   /**
+   * @param {Record<string, any>} - array dtos of an entity
+   * @return {Boolean} This will be truthly value.
+   */
+  addMany: (dtos: Record<string, any>[]) => Promise<boolean>
+
+  /**
    * @param {string} - A string type param
    * @param {IBaseUpdatePicker<E, K>} - A dto for updating entity type E,
    * @return {boolean} This will return true/false

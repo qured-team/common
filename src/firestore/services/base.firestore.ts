@@ -61,18 +61,42 @@ export class BaseService<E extends IIdentity> implements IService<E> {
     }
   }
 
+  addMany = async (dtos: any[]): Promise<boolean> => {
+    try {
+      const dbBatch = firestore.batch()
+      const docRef = firestore.collection(this.ENTITY_CLASS).doc()
+
+      dtos.forEach(async (dto, index) => {
+        const data = {
+          ...dto,
+          createdAt: isoNow()
+        }
+        dbBatch.set(docRef, data)
+      })
+      const result = await dbBatch.commit()
+
+      if (!result.length) {
+        throw DbError('Unable to save entities into db!')
+      }
+
+      return true
+    } catch (error) {
+      throw error
+    }
+  }
+
   add = async (payload: any): Promise<E> => {
     try {
       const document = firestore.collection(this.ENTITY_CLASS).doc()
       const data = {
-        createdAt: isoNow(),
-        ...payload
+        ...payload,
+        createdAt: isoNow()
       }
 
       const result = await document.set(data)
 
       if (!result) {
-        throw DbError('Unable to add')
+        throw DbError('Unable to save entity into db.')
       }
 
       return data
@@ -101,7 +125,8 @@ export class BaseService<E extends IIdentity> implements IService<E> {
         .collection(this.ENTITY_CLASS)
         .doc(element.id)
         .update({
-          ...payload
+          ...payload,
+          updatedAt: isoNow()
         })
 
       if (!entity) {
