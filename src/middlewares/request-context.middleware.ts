@@ -5,7 +5,7 @@ type IUser  = {
     id: string
 }
 
-type IRequestContext = {
+export type IRequestContext = {
     correlationId: string
     user: IUser
 }
