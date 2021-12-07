@@ -64,9 +64,9 @@ export class BaseService<E extends IIdentity> implements IService<E> {
   addMany = async (dtos: any[]): Promise<boolean> => {
     try {
       const dbBatch = firestore.batch()
-      const docRef = firestore.collection(this.ENTITY_CLASS).doc()
+      dtos.forEach((dto) => {
+        const docRef = firestore.collection(this.ENTITY_CLASS).doc()
 
-      dtos.forEach(async (dto, index) => {
         const data = {
           ...dto,
           createdAt: isoNow()

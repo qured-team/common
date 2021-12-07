@@ -55,7 +55,8 @@ interface CallBack {
 export const readCSVBatches = (
   path: string,
   callback: CallBack,
-  options?: IOption
+  options?: IOption,
+  onClose?: Function
 ) => {
   const op = {
     ...{
@@ -108,6 +109,7 @@ export const readCSVBatches = (
     if (batches.length !== 0) {
       callback(batches)
     }
+    onClose()
   })
 }
 
