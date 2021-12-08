@@ -7,6 +7,9 @@ import fs from 'fs'
 import { LOGS_SEVERITY } from './options'
 import { X_CORRELATION_HEADER } from '../utilities/utils'
 import { IRequestContext } from '../middlewares'
+import { google } from '@google-cloud/logging/build/protos/protos'
+
+const LogSeverity = google.logging.type.LogSeverity
 
 const logger = winston.createLogger({
   transports: [new winston.transports.Console()],
@@ -195,13 +198,13 @@ class CloudLogging {
     next()
   }
 
-  info(text, context?: IRequestContext, data?: Record<string, any>) {
+  info(text: string, context?: IRequestContext, data?: Record<string, any>) {
     logger.info(text)
     if (cloudLoggingOff) return
 
     const entry = this.log.entry(
       {
-        severity: 'INFO',
+        severity: LogSeverity.INFO,
         trace: this.getTraceId(context),
         textPayload: text,
         jsonPayload: data
@@ -211,13 +214,13 @@ class CloudLogging {
     this.log.write(entry)
   }
 
-  debug(text, context?: IRequestContext, data?: Record<string, any>) {
+  debug(text: string, context?: IRequestContext, data?: Record<string, any>) {
     logger.info(text)
     if (cloudLoggingOff) return
 
     const entry = this.log.entry(
       {
-        severity: 'DEBUG',
+        severity: LogSeverity.DEBUG,
         trace: this.getTraceId(context),
         textPayload: text,
         jsonPayload: data
@@ -227,13 +230,13 @@ class CloudLogging {
     this.log.write(entry)
   }
 
-  warn(text, context?: IRequestContext, data?: Record<string, any>) {
+  warn(text: string, context?: IRequestContext, data?: Record<string, any>) {
     logger.warn(text)
     if (cloudLoggingOff) return
 
     const entry = this.log.entry(
       {
-        severity: 'WARNING',
+        severity: LogSeverity.WARNING,
         trace: this.getTraceId(context),
         textPayload: text,
         jsonPayload: data
@@ -255,7 +258,7 @@ class CloudLogging {
 
     const entry = this.log.entry(
       {
-        severity: 'ERROR',
+        severity: LogSeverity.ERROR,
         trace: this.getTraceId(context),
         textPayload: `${text} error: ${error?.message}`,
         jsonPayload: data
@@ -265,10 +268,10 @@ class CloudLogging {
     this.log.error(entry)
   }
 
-  alert(text, context?: IRequestContext, data?: Record<string, any>) {
+  alert(text: string, context?: IRequestContext, data?: Record<string, any>) {
     const entry = this.log.entry(
       {
-        severity: 'ALERT',
+        severity: LogSeverity.ALERT,
         trace: this.getTraceId(context),
         textPayload: text,
         jsonPayload: data
