@@ -105,7 +105,7 @@ export const readCSVBatches = (
     batches = []
   })
 
-  readStream.on('close', async () => {
+  readStream.on('close', () => {
     if (batches.length !== 0) {
       callback(batches)
     }
