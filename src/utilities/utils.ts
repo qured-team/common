@@ -78,7 +78,7 @@ export const readCSVBatches = (
   readStream.on('line', (line) => {
     const data = line.split(splitter)
 
-    // if header is present
+    // if header row is present in csv
     if (hasHeader && !headers.length) {
       headers = data
       return
@@ -105,11 +105,11 @@ export const readCSVBatches = (
     batches = []
   })
 
-  readStream.on('close', () => {
+  readStream.on('close', async () => {
     if (batches.length !== 0) {
       callback(batches)
     }
-    onClose()
+
+    onClose && onClose()
   })
 }
-

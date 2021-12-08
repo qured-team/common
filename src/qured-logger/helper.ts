@@ -81,8 +81,6 @@ class CloudLogging {
       if (r.status.includes(statusCode)) {
         severity = r.severity
       }
-
-      // @todo: default
     })
 
     const resource = {
@@ -150,6 +148,12 @@ class CloudLogging {
     }
   }
 
+  private getTraceId(context: IRequestContext) {
+    return context?.correlationId
+      ? `projects/${serviceAccount.project_id}/traces/${context?.correlationId}`
+      : globalLogFields['logging.googleapis.com/trace']
+  }
+
   /*
     Different log type
   */
@@ -191,62 +195,83 @@ class CloudLogging {
     next()
   }
 
-  info(text, context?: IRequestContext) {
+  info(text, context?: IRequestContext, data?: Record<string, any>) {
     logger.info(text)
     if (cloudLoggingOff) return
 
     const entry = this.log.entry(
       {
         severity: 'INFO',
-        trace:
-          context?.correlationId ||
-          globalLogFields['logging.googleapis.com/trace'],
-        textPayload: text
+        trace: this.getTraceId(context),
+        textPayload: text,
+        jsonPayload: data
       },
       text
     )
     this.log.write(entry)
   }
-  warn(text, context?: IRequestContext) {
+
+  debug(text, context?: IRequestContext, data?: Record<string, any>) {
+    logger.info(text)
+    if (cloudLoggingOff) return
+
+    const entry = this.log.entry(
+      {
+        severity: 'DEBUG',
+        trace: this.getTraceId(context),
+        textPayload: text,
+        jsonPayload: data
+      },
+      text
+    )
+    this.log.write(entry)
+  }
+
+  warn(text, context?: IRequestContext, data?: Record<string, any>) {
     logger.warn(text)
     if (cloudLoggingOff) return
 
     const entry = this.log.entry(
       {
         severity: 'WARNING',
-        trace:
-          context?.correlationId ||
-          globalLogFields['logging.googleapis.com/trace'],
-        textPayload: text
+        trace: this.getTraceId(context),
+        textPayload: text,
+        jsonPayload: data
       },
       text
     )
     this.log.warning(entry)
   }
-  error(text, context?: IRequestContext) {
+
+  error(
+    text: string,
+    context?: IRequestContext,
+    error?: Error,
+    data?: Record<string, any>
+  ) {
     logger.error(text)
+
     if (cloudLoggingOff) return
 
     const entry = this.log.entry(
       {
         severity: 'ERROR',
-        trace:
-          context?.correlationId ||
-          globalLogFields['logging.googleapis.com/trace'],
-        textPayload: text
+        trace: this.getTraceId(context),
+        textPayload: `${text} error: ${error?.message}`,
+        jsonPayload: data
       },
       text
     )
     this.log.error(entry)
   }
-  alert(text, context?: IRequestContext) {
+
+  alert(text, context?: IRequestContext, data?: Record<string, any>) {
     const entry = this.log.entry(
       {
         severity: 'ALERT',
-        trace:
-          context?.correlationId ||
-          globalLogFields['logging.googleapis.com/trace'],
-        textPayload: text
+        trace: this.getTraceId(context),
+        textPayload: text,
+        jsonPayload: data
       },
       text
     )
