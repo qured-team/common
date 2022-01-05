@@ -142,9 +142,15 @@ class CloudLogging {
       if (body?.data?.getPassportImage) {
         delete body?.data?.getPassportImage?.b64Image
       }
+
+      if (body?.image?.b64Image) {
+        delete body.image.b64Image
+      }
+
       return body
     } catch (e) {
-      console.log(e)
+      console.error(e)
+      this.error(e.message, undefined, e)
     }
   }
 
