@@ -160,7 +160,7 @@ class CloudLogging {
   request(req, res, time) {
     if (cloudLoggingOff) return
 
-    const { body } = this.cleanUp(req.body)
+    const body = this.cleanUp(req.body)
     const rawBody = this.cleanUp(this.resBody)
 
     const input = {
