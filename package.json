@@ -1,6 +1,6 @@
 {
   "name": "@qured/common",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "This package will contain reusable modules, middlewares, exceptions etc",
   "main": "index.js",
   "scripts": {
