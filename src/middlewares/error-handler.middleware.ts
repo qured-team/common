@@ -12,11 +12,11 @@ export const errorMiddleware = (
   const context = getRequestContext(req)
 
   try {
-    let status: number = error.status
+    let status: number = error?.status
     if (!status) {
       status = typeof error?.code === 'number' ? error.code : 500
     }
-    const message: string = error.message || 'Something went wrong'
+    const message: string = error?.message || 'Something went wrong'
 
     Logger.error(`http status : ${status}, errorMessage : ${message}`, context)
 
