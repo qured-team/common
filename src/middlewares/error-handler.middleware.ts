@@ -12,9 +12,9 @@ export const errorMiddleware = (
   const context = getRequestContext(req)
 
   try {
-    let status: number = error.status
+    let status: number = error?.status
     if (!status) {
-      status = typeof error?.code === 'number' ? error.code : 500
+      status = typeof error?.code === 'number' ? error?.code : 500
     }
     const message: string = error.message || 'Something went wrong'
 
