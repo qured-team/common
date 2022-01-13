@@ -29,7 +29,7 @@ export interface IService<E extends IIdentity> {
    * @param {Record<string, any>} filters - An filters params
    * @return {Array<E>} This will be array objects of type E
    */
-  getBy: (filters?: Record<string, any>) => Promise<Array<E>>
+  getBy: (filters: Record<string, any>) => Promise<Array<E>>
 
   /**
    * @param {string}  id - A string param.
