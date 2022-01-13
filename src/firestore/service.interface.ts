@@ -16,7 +16,7 @@ export interface IService<E extends IIdentity> {
    * @param {Record<string, any>} filters - An filters params
    * @param {string} orderBy - An optional param order by field should be indexed in firestore
    * @param {string} orderIndex - An optional param.
-   * @return {E} This will be array objects of type E
+   * @return {Array<E>} This will be array objects of type E
    */
   get: (
     pager: Pager,
@@ -24,6 +24,12 @@ export interface IService<E extends IIdentity> {
     orderBy?: string,
     orderIndex?: OrderIndex
   ) => Promise<Array<E>>
+
+  /**
+   * @param {Record<string, any>} filters - An filters params
+   * @return {Array<E>} This will be array objects of type E
+   */
+  getBy: (filters: Record<string, any>) => Promise<Array<E>>
 
   /**
    * @param {string}  id - A string param.

@@ -45,6 +45,33 @@ export class BaseService<E extends IIdentity> implements IService<E> {
     }
   }
 
+  getBy = async (filters: Record<string, any>): Promise<Array<E>> => {
+    try {
+      const result: Array<E> = []
+
+      let query: any = firestore.collection(this.ENTITY_CLASS)
+
+      filters &&
+        Object.keys(filters).forEach((key) => {
+          query = query.where(key, '==', filters[key])
+        })
+
+      const snapshot = await query.get()
+
+      snapshot.forEach((element) => {
+        const entity: E = {
+          id: element.id,
+          ...(element.data() as E)
+        }
+
+        result.push(entity)
+      })
+      return result
+    } catch (error) {
+      throw error
+    }
+  }
+
   getById = async (id: string): Promise<E> => {
     try {
       const user = await firestore.collection(this.ENTITY_CLASS).doc(id).get()
