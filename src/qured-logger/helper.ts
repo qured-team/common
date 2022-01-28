@@ -6,7 +6,7 @@ import fs from 'fs'
 
 import { LOGS_SEVERITY } from './options'
 import { X_CORRELATION_HEADER } from '../utilities/utils'
-import { IRequestContext } from '../middlewares'
+import { getRequestContext, IRequestContext } from '../middlewares'
 
 const logger = winston.createLogger({
   transports: [new winston.transports.Console()],
@@ -178,9 +178,10 @@ class CloudLogging {
     }
 
     const metadata = this.setupLogRequestMetadata(req, res, time)
+    const context = getRequestContext(req)
 
     const entry = this.log.entry(
-      { ...metadata, trace: globalLogFields['logging.googleapis.com/trace'] },
+      { ...metadata, trace: this.getTraceId(context) },
       input
     )
 
