@@ -3,10 +3,13 @@ import winston from 'winston'
 import { LogEntry } from '@google-cloud/logging/build/src/entry'
 
 import fs from 'fs'
+import { getNamespace } from 'cls-hooked'
 
 import { LOGS_SEVERITY } from './options'
 import { X_CORRELATION_HEADER } from '../utilities/utils'
 import { getRequestContext, IRequestContext } from '../middlewares'
+
+const ns = getNamespace('APP_NAMESPACE')
 
 const logger = winston.createLogger({
   transports: [new winston.transports.Console()],
@@ -155,6 +158,12 @@ class CloudLogging {
   }
 
   private getTraceId(context: IRequestContext) {
+    const correlationId = ns.get(X_CORRELATION_HEADER)
+
+    if (correlationId) {
+      return `projects/${serviceAccount.project_id}/traces/${correlationId}`
+    }
+
     return context?.correlationId
       ? `projects/${serviceAccount.project_id}/traces/${context?.correlationId}`
       : globalLogFields['logging.googleapis.com/trace']
@@ -210,7 +219,7 @@ class CloudLogging {
       {
         severity: 'INFO',
         trace: this.getTraceId(context),
-        textPayload: text,
+        textPayload: data ? JSON.stringify(data) : '',
         jsonPayload: data
       },
       text
@@ -226,7 +235,7 @@ class CloudLogging {
       {
         severity: 'DEBUG',
         trace: this.getTraceId(context),
-        textPayload: text,
+        textPayload: data ? JSON.stringify(data) : '',
         jsonPayload: data
       },
       text
@@ -242,7 +251,7 @@ class CloudLogging {
       {
         severity: 'WARNING',
         trace: this.getTraceId(context),
-        textPayload: text,
+        textPayload: data ? JSON.stringify(data) : '',
         jsonPayload: data
       },
       text
@@ -264,10 +273,10 @@ class CloudLogging {
       {
         severity: 'ERROR',
         trace: this.getTraceId(context),
-        textPayload: `${text} error: ${error?.message}`,
+        textPayload: data ? JSON.stringify(data) : '',
         jsonPayload: data
       },
-      text
+      `${text}, ${error?.message}`
     )
     this.log.error(entry)
   }
@@ -277,7 +286,7 @@ class CloudLogging {
       {
         severity: 'ALERT',
         trace: this.getTraceId(context),
-        textPayload: text,
+        textPayload: data ? JSON.stringify(data) : '',
         jsonPayload: data
       },
       text
